@@ -1,29 +1,27 @@
-import json
-from fastapi import FastAPI, Request, Response
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import Update
-import os
 import asyncio
+import logging
+import sys
+import os
 
-from bot import dp, bot
+# Добавляем корневую папку в путь, чтобы Python видел bot.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-app = FastAPI()
+# Импортируем бота
+from bot import bot, dp, main
 
-@app.post("/webhook")
-async def webhook(request: Request):
+# Это функция, которую Vercel вызовет при старте
+async def handler(request):
+    # Запускаем Ксюшу
+    logging.basicConfig(level=logging.INFO)
+    print("❤️ Ксюша запускается на Vercel (через Webhook) ❤️")
+    
+    # Запускаем polling
     try:
-        body = await request.json()
-        update = Update(**body)
-        await dp.feed_update(bot, update)
-        return Response(status_code=200, content="OK")
+        await dp.start_polling(bot)
     except Exception as e:
-        print(f"Ошибка: {e}")
-        return Response(status_code=200, content="OK")
+        logging.error(f"Бот упал с ошибкой: {e}")
+    
+    return {"status": "running"}
 
-@app.get("/")
-async def root():
-    return {"status": "Ксюша бот работает на Vercel"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# Vercel ожидает, что переменная будет называться handler
+handler = handler

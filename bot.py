@@ -112,11 +112,3 @@ async def chat_with_ksenia(message: types.Message):
     except Exception as e:
         logging.error(f"Ошибка: {e}")
         await message.answer("ой, милый, у меня что-то зависло на секунду. повтори, пожалуйста")
-
-async def main():
-    logging.basicConfig(level=logging.INFO)
-    print("❤️ Ксюша запущена ❤️")
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
